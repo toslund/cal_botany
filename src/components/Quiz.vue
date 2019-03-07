@@ -31,9 +31,10 @@
     </v-layout>
     <v-layout
       text-xs-center
+      justify-center
       wrap
       v-if="step == 'guess'">
-      <v-flex xs12>
+      <v-flex xs12 md8 lg6>
     <v-card
             v-for="(val, idx) in visiblePlant"
             :key="idx"
