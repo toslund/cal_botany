@@ -48,8 +48,14 @@
             <v-carousel-item
               v-for="(value, i) in val.ninePhotos"
               :key="i"
-              :src="value.medium_url"
-            ></v-carousel-item>
+            >
+              <div style="background-color: #D3D3D3; height: 100%">
+                <img
+                  style="height:100%"
+                  :src="value.medium_url"
+                >
+              </div>
+            </v-carousel-item>
           </v-carousel>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
