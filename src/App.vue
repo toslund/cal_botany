@@ -34,7 +34,7 @@
     </v-navigation-drawer>
     <v-toolbar class="light-green darken-4 white--text" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Learn California's Biodiversity</v-toolbar-title>
+      <v-toolbar-title>Learn About California's Biodiversity</v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
