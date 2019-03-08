@@ -8,7 +8,7 @@
       <v-flex xs12>
         <v-card>
           <v-card-title class="headline font-weight-regular light-green lighten-4">
-            Customize your Study Session
+            Choose a Plant List
           </v-card-title>
             <v-card-text>
             <v-autocomplete
