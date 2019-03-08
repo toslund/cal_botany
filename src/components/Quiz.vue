@@ -40,7 +40,6 @@
           :key="idx"
           v-show="idx == 1">
         <v-card-text>
-        <p> {{idx}} </p>
             <v-carousel
               :cycle="false"
               v-model="carouselIndex"
@@ -109,7 +108,7 @@
                 :disabled="!val.submitted">Review Results</v-btn>
             </div>
             <div>
-              Score: {{ totalCorrect }}/{{ totalGuessed }}
+              {{ plantIndex }} of {{ totalPlants }}
             </div>
           </v-card-text>
           </v-card>
@@ -181,6 +180,13 @@ export default {
     return {
       step: 'customize',
       studyLists: {
+        'Falcons of Southern California': ['Falco sparverius', 'Haliaeetus leucocephalus',
+          'Aquila chrysaetos', 'Falco peregrinus', 'Circus hudsonius', 'Elanus leucurus',
+          'Parabuteo unicinctus', 'Accipiter cooperii', 'Buteo lineatus', 'Buteo jamaicensis',
+          'Accipiter striatus', 'Buteo swainsoni', 'Tyto alba', 'Athene cunicularia',
+          'Bubo virginianus', 'Megascops kennicottii', 'Pandion haliaetus', 'Cathartes aura'],
+        'Coastal Sage Scrub (Venturan/Diegan)': ['Artemisia californica', 'Eriogonum fasciculatum',
+          'Diplacus aurantiacus', 'Isocoma menziesii', 'Opuntia littoralis'],
         'Oaks of Mendocino County': ['Quercus douglasii', 'Quercus garryana', 'Quercus lobata', 'Quercus agrifolia',
           'Quercus kelloggii', 'Quercus parvula', 'Quercus parvula shrevei', 'Quercus wislizeni', 'Quercus chrysolepis'],
         'Orange County Invasive Priorities (NCC Priority I&II)': ['Acacia cyclops', 'Acacia redolens', 'Aegilops triuncialis',
@@ -204,7 +210,7 @@ export default {
           'Washingtonia filifera', 'Washingtonia robusta'],
         'Lilies of Orange County': ['Calochortus albus', 'Calochortus splendens', 'Calochortus catalinae',
           'Calochortus invenustus', 'Calochortus plummerae', 'Calochortus weedii', 'Lilium humboldtii'],
-        'All Species in California!': null
+        // 'All Species in California!': null
       },
       list: null,
       quizData: [],
@@ -233,16 +239,18 @@ export default {
       this.info = data;
       console.log('cleaning');
       for (var i = 0; i < data.length; i++) {
-        for (var photo in data[i].photos) {
-          if (data[i].photos[photo].license_code.slice(0, 2) === 'CC') {
-            this.quizData[speciesIdx].photos.push(data[i].photos[photo]);
+        if (data[i].taxon.name === this.quizData[speciesIdx].sn) {
+          for (var photo in data[i].photos) {
+            if (data[i].photos[photo].license_code.slice(0, 2) === 'CC') {
+              this.quizData[speciesIdx].photos.push(data[i].photos[photo]);
+            }
           }
         }
+        if (this.quizData[speciesIdx].photos.length >= 9 ) {
+          this.quizData[speciesIdx].ninePhotos = this.jumbleArray(this.quizData[speciesIdx].photos).slice(-9);
+        } else { this.quizData[speciesIdx].ninePhotos = this.jumbleArray(this.quizData[speciesIdx].photos); }
+        // this.$set(this.fetched, species, compiledPhotos);
       }
-      if (this.quizData[speciesIdx].photos.length >= 9 ) {
-        this.quizData[speciesIdx].ninePhotos = this.jumbleArray(this.quizData[speciesIdx].photos).slice(-9);
-      } else { this.quizData[speciesIdx].ninePhotos = this.jumbleArray(this.quizData[speciesIdx].photos); }
-      // this.$set(this.fetched, species, compiledPhotos);
     },
     makeQuiz: function () {
       for (var i in this.plants) {
@@ -278,7 +286,15 @@ export default {
     },
     next: function() {
       this.plantIndex += 1;
-      this.carouselIndex = 0;
+      // for (var i; i < 100; i += 1) {
+      //   if (this.carouselIndex == 0) { break }
+      //   else if (this.carouselIndex == this.visiblePlant[1].photos.length - 1) {
+      //     this.carouselIndex += 1;
+      //     break
+      //   }
+      //   else {this.carouselIndex += 1;}
+      // }
+      // this.carouselIndex = 0;
     },
     previous: function() {
       this.plantIndex -= 1;
