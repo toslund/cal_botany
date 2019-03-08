@@ -8,7 +8,7 @@
       <v-flex xs12>
         <v-card>
           <v-card-title class="headline font-weight-regular light-green lighten-4">
-            Choose a Plant List
+            Choose a List
           </v-card-title>
             <v-card-text>
             <v-autocomplete
@@ -17,7 +17,7 @@
               :hint="'Choose a plant list to study'"
               persistent-hint
               :items="listChoices"
-              prepend-icon="local_florist"
+              prepend-icon="pets"
             >
             </v-autocomplete>
             <v-btn @click="makeQuiz()"
@@ -64,17 +64,26 @@
             </v-tooltip>
 
             <div v-show="!val.submitted">
-              <v-radio-group v-model="val.guess">
-              <v-radio
-                v-for="n in val.choices"
-                :key="n"
-                :label="n"
-                :value="n"
-              ></v-radio>
-            </v-radio-group>
+              <v-autocomplete
+              v-model="val.guess"
+              clearable
+              :hint="'Start typing and your options will autocomplete!'"
+              persistent-hint
+              :items="allCns"
+              prepend-icon="create"
+            >
+            </v-autocomplete>
+              <!--<v-radio-group v-model="val.guess">-->
+              <!--<v-radio-->
+                <!--v-for="(choice, i) in val.choices"-->
+                <!--:key="i"-->
+                <!--:label="choice.cn"-->
+                <!--:value="choice.sn"-->
+              <!--&gt;</v-radio>-->
+            <!--</v-radio-group>-->
             </div>
             <div v-show="val.submitted">
-              <p class="justify-center headline font-weight-bold">{{ val.sn }}</p>
+              <p class="justify-center headline font-weight-bold">{{ val.cn }}</p>
               <div class="text-xs-center">
                 <img
                   style="max-width:100px;"
@@ -175,36 +184,23 @@
 import axios from 'axios';
 
 export default {
-  name: 'Quiz',
+  name: 'FaunaQuiz',
   data: function() {
     return {
       step: 'customize',
       studyLists: {
-        'Coastal Sage Scrub (Venturan/Diegan)': ['Artemisia californica', 'Eriogonum fasciculatum',
-          'Diplacus aurantiacus', 'Isocoma menziesii', 'Opuntia littoralis'],
-        'Oaks of Mendocino County': ['Quercus douglasii', 'Quercus garryana', 'Quercus lobata', 'Quercus agrifolia',
-          'Quercus kelloggii', 'Quercus parvula', 'Quercus parvula shrevei', 'Quercus wislizeni', 'Quercus chrysolepis'],
-        'Orange County Invasive Priorities (NCC Priority I&II)': ['Acacia cyclops', 'Acacia redolens', 'Aegilops triuncialis',
-          'Ageratina adenophora', 'Ailanthus altissima', 'Albizia lophantha',
-          'Araujia sericifera', 'Arctotheca calendula', 'Arundo donax', 'Asparagus asparagoides',
-          'Asphodelus fistulosus', 'Brassica tournefortii', 'Cenchrus echinatus', 'Cenchrus longispinus',
-          'Centaurea diluta', 'Centaurea solstitialis', 'Chrysanthemoides monilifera', 'Cirsium vulgare',
-          'Conium maculatum', 'Cortaderia jubata', 'Cortaderia selloana', 'Cynara cardunculus', 'Delairea odorata',
-          'Dittrichia graveolens', 'Echium candicans', 'Ehrharta calycina', 'Ehrharta longiflora', 'Emex spinosa',
-          'Erodium malacoides', 'Euphorbia terracina', 'Euphorbia virgata', 'Ficus carica', 'Foeniculum vulgare',
-          'Galenia pubescens', 'Gazania linearis', 'Glebionis coronaria', 'Hypericum canariense',
-          'Iris pseudacorus', 'Kochia scoparia', 'Lepidium appelianum', 'Lepidium draba', 'Lepidium latifolium',
-          'Leucanthemum vulgare', 'Ligustrum japonicum', 'Limonium duriusculum', 'Limonium ramosissimum',
-          'Lonicera japonica', 'Malephora crocea', 'Melia azedarach', 'Melinis repens', 'Nassella tenuissima',
-          'Olea europaea', 'Oncosiphon piluliferum', 'Parkinsonia aculeata', 'Parthenium hysterophorus',
-          'Parthenocissus quinquefolia', 'Pennisetum setaceum', 'Phalaris aquatica', 'Plantago arenaria',
-          'Plecostachys serpyllifolia', 'Ricinus communis', 'Robinia pseudoacacia', 'Rubus armeniacus',
-          'Salpichroa origanifolia', 'Schinus molle', 'Schinus terebinthifolius', 'Senecio linearifolius',
-          'Spartium junceum', 'Tamarix aphylla Athel', 'Tamarix ramosissima', 'Tropaeolum majus',
-          'Ulmus parvifolia', 'Verbesina encelioides', 'Vinca major', 'Volutaria tubuliflora',
-          'Washingtonia filifera', 'Washingtonia robusta'],
-        'Lilies of Orange County': ['Calochortus albus', 'Calochortus splendens', 'Calochortus catalinae',
-          'Calochortus invenustus', 'Calochortus plummerae', 'Calochortus weedii', 'Lilium humboldtii'],
+        'Falcons of Southern California': [{ sn: 'Falco sparverius', cn: 'American kestrel' }, { sn: 'Haliaeetus leucocephalus', cn: 'bald eagle' },
+          { sn: 'Aquila chrysaetos', cn: 'golden eagle' }, { sn: 'Falco peregrinus', cn: 'peregrine falcon'},
+          { sn: 'Circus hudsonius', cn: 'Northern harrier' }, { sn: 'Elanus leucurus', cn: 'white-tailed kite' },
+          { sn: 'Parabuteo unicinctus', cn: "Harris's hawk" }, { sn: 'Accipiter cooperii', cn: "Cooper's hawk" },
+          { sn: 'Buteo lineatus', cn: 'red-shouldered hawk' }, { sn: 'Buteo jamaicensis', cn: 'red-tailed hawk' },
+          { sn: 'Accipiter striatus', cn: 'sharp-shinned hawk' }, { sn: 'Buteo swainsoni', cn: "Swainson's hawk" },
+          { sn: 'Tyto alba', cn: 'barn owl' }, { sn: 'Athene cunicularia', cn: 'burrowing owl' },
+          { sn: 'Bubo virginianus', cn: 'great horned owl' }, { sn: 'Megascops kennicottii', cn: 'western screech owl' },
+          { sn: 'Pandion haliaetus', cn: 'western osprey ' }, { sn: 'Cathartes aura', cn: 'turkey vulture' }],
+        'Plovers of Orange county': [{ 'sn':'Pluvialis squatarola', 'cn': 'grey plover' }, { 'sn': 'Pluvialis fulva', 'cn': 'Pacific golden plover' },
+          { 'sn': 'Charadrius nivosus', 'cn': 'snowy plover' }, { 'sn': 'Charadrius semipalmatus', 'cn': 'semipalmated plover' },
+          { 'sn': 'Charadrius vociferus', 'cn': 'killdeer' }]
         // 'All Species in California!': null
       },
       list: null,
@@ -215,7 +211,7 @@ export default {
   },
   methods: {
     fetch: function (speciesIdx) {
-      var speciesName = this.plants[speciesIdx]
+      var speciesName = this.plants[speciesIdx].sn
       console.log('fetching');
       var obsURL = "https://www.inaturalist.org/observations.json?";
       var params = new URLSearchParams({
@@ -251,7 +247,7 @@ export default {
       for (var i in this.plants) {
         console.log(this.plants[i]);
         console.log(i);
-        this.quizData[i].choices = this.getChoices(this.plants[i])
+        this.quizData[i].choices = this.getChoices(i)
         this.fetch(i);
         this.step = 'guess';
       }
@@ -264,17 +260,17 @@ export default {
       }
       return a;
     },
-    getChoices: function (correctPlant) {
+    getChoices: function (correctIdx) {
       let a = this.plants.slice();
-      let idx = a.indexOf(correctPlant);
-      a.splice(idx, 1);
+      // let idx = a.indexOf(correctPlant);
+      a.splice(correctIdx, 1);
       let jumbledA = this.jumbleArray(a);
       let choices = jumbledA.slice(-3);
-      choices.push(correctPlant);
+      choices.push(this.plants[correctIdx]);
       return this.jumbleArray(choices);
     },
     submit: function () {
-      if (this.quizData[this.plantIndex].guess === this.quizData[this.plantIndex].sn) {
+      if (this.quizData[this.plantIndex].guess === this.quizData[this.plantIndex].cn) {
         this.quizData[this.plantIndex].result = true;
       } else {this.quizData[this.plantIndex].result = false;}
       this.quizData[this.plantIndex].submitted = true
@@ -312,20 +308,29 @@ export default {
       var jumbledSpecies = this.jumbleArray(species);
       for (var i in jumbledSpecies) {
         this.quizData.push({
-          sn: jumbledSpecies[i],
+          sn: jumbledSpecies[i].sn,
+          cn: jumbledSpecies[i].cn,
           photos: [],
           ninePhotos: [],
           choices: [],
           guess: null,
           submitted: false,
           result: null
-        })
+        });
         // this.$set(jumbledSpecies[i], this.quizData[this.chosenType][taxon], {
         //   "photos": [],
         //   "guess": null
         // });
       }
       return jumbledSpecies
+    },
+    allCns: function() {
+      var allCommonNames = [];
+      for (var i in this.plants) {
+        allCommonNames.push(this.plants[i].cn);
+      }
+      allCommonNames.sort();
+      return allCommonNames;
     },
     visiblePlant: function() {
       if (this.plantIndex == 0) {

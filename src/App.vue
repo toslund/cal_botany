@@ -22,11 +22,19 @@
             <v-list-tile-title>Study Flora</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile @click="fakeRouter('faunaquiz')">
+          <v-list-tile-action>
+            <v-icon>pets</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Study Fauna</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
     <v-toolbar class="light-green darken-4 white--text" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Learn California Plants</v-toolbar-title>
+      <v-toolbar-title>Learn California's Biodiversity</v-toolbar-title>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
@@ -37,6 +45,7 @@
           <v-flex text-xs-center>
             <welcome v-if="fakeRoute == 'welcome'"></welcome>
             <quiz v-show="fakeRoute == 'quiz'"></quiz>
+            <fauna-quiz v-show="fakeRoute == 'faunaquiz'"></fauna-quiz>
           </v-flex>
         </v-layout>
       </v-container>
@@ -55,6 +64,8 @@
 
 <script>
 import Quiz from './components/Quiz.vue';
+import FaunaQuiz from './components/FaunaQuiz.vue';
+
 import Welcome from './components/Welcome.vue';
 
 
@@ -63,6 +74,7 @@ export default {
   components: {
     Welcome,
     Quiz,
+    FaunaQuiz,
   },
   data () {
     return {
