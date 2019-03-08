@@ -33,98 +33,140 @@
       text-xs-center
       justify-center
       wrap
-      v-if="step == 'guess'">
+      v-if="step == 'guess' && !finished">
       <v-flex xs12 md8 lg6>
-    <v-card
-            v-for="(val, idx) in visiblePlant"
-            :key="idx"
-            v-show="idx == 1"
-          >
-            <v-card-text>
-              <p> {{idx}} </p>
-          <v-carousel
-            :cycle="false"
-            v-model="carouselIndex"
-            >
-            <v-carousel-item
-              v-for="(value, i) in val.ninePhotos"
-              :key="i"
-            >
-              <div style="background-color: #D3D3D3; height: 100%">
-                <img
-                  style="height:100%"
-                  :src="value.medium_url"
-                >
-              </div>
-            </v-carousel-item>
-          </v-carousel>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-icon color="primary" dark v-on="on">copyright</v-icon>
-            </template>
-            <!--<span>iNaturalist: {{ eightPhotos[carouselIndex].attribution }}</span>-->
-          </v-tooltip>
-
-          <div v-show="!val.submitted">
-            <v-radio-group v-model="val.guess">
-            <v-radio
-              v-for="n in val.choices"
-              :key="n"
-              :label="n"
-              :value="n"
-            ></v-radio>
-          </v-radio-group>
-          </div>
-          <div v-show="val.submitted">
-            <p class="justify-center headline font-weight-bold">{{ val.sn }}</p>
-            <div class="text-xs-center">
-              <img
-                style="max-width:100px;"
-                :src="val.result ? require('../assets/good.png') : require('../assets/bad.png')">
-            </div>
-          </div>
-          <div>
-            <v-btn
-              @click="submit()"
-              color="success"
-              :disabled="!val.guess || val.submitted"
-            >Submit
-            </v-btn>
-            <v-btn
-              @click="next()"
-              color="success"
-              :disabled="!val.submitted">Next</v-btn>
-            <v-dialog
-              v-model="dialog"
-              max-width="400"
-              v-if="dialog"
-            >
-              <v-card>
-                <v-img
-                  aspect-ratio="1"
-                  :src="dialogPhoto.medium_url"
-                ></v-img>
-                <v-card-title class="justify-center headline font-weight-bold">{{ dialogSpecies }}</v-card-title>
-                <v-card-text>
-                  <div class="text-xs-center"><img style="max-width:100px;" :src="guessCorrect ? require('../assets/good.png') : require('../assets/bad.png')"></div>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="green darken-1"
-                    @click="nextRound()"
+        <v-card
+          v-for="(val, idx) in visiblePlant"
+          :key="idx"
+          v-show="idx == 1">
+        <v-card-text>
+        <p> {{idx}} </p>
+            <v-carousel
+              :cycle="false"
+              v-model="carouselIndex"
+              >
+              <v-carousel-item
+                v-for="(value, i) in val.ninePhotos"
+                :key="i"
+              >
+                <div style="background-color: #D3D3D3; height: 100%">
+                  <img
+                    style="height:100%"
+                    :src="value.medium_url"
                   >
-                    Next
-                  </v-btn>
-                </v-card-actions>
+                </div>
+              </v-carousel-item>
+            </v-carousel>
+            <v-tooltip bottom v-if="val.ninePhotos">
+              <template v-slot:activator="{ on }">
+                <v-icon color="primary" dark v-on="on">copyright</v-icon>
+              </template>
+              <span>iNaturalist: {{ val.ninePhotos[carouselIndex].attribution }}</span>
+            </v-tooltip>
+
+            <div v-show="!val.submitted">
+              <v-radio-group v-model="val.guess">
+              <v-radio
+                v-for="n in val.choices"
+                :key="n"
+                :label="n"
+                :value="n"
+              ></v-radio>
+            </v-radio-group>
+            </div>
+            <div v-show="val.submitted">
+              <p class="justify-center headline font-weight-bold">{{ val.sn }}</p>
+              <div class="text-xs-center">
+                <img
+                  style="max-width:100px;"
+                  :src="val.result ? require('../assets/good.png') : require('../assets/bad.png')">
+              </div>
+            </div>
+            <div
+            v-if="!finished">
+              <v-btn
+                @click="previous()"
+                color="teal lighten-4"
+                :disabled="plantIndex == 0"
+                >Previous</v-btn>
+              <v-btn
+                @click="submit()"
+                color="green darken-2"
+                :disabled="!val.guess || val.submitted"
+              >Submit
+              </v-btn>
+              <v-btn
+                @click="next()"
+                color="teal lighten-4"
+                v-if="plantIndex < totalPlants - 1"
+                :disabled="!val.submitted">Next</v-btn>
+            </div>
+            <div
+            v-else>
+              <v-btn
+                @click="seeResults()"
+                color="success"
+                :disabled="!val.submitted">Review Results</v-btn>
+            </div>
+            <div>
+              Score: {{ totalCorrect }}/{{ totalGuessed }}
+            </div>
+          </v-card-text>
+          </v-card>
+        </v-flex>
+      </v-layout>
+      <v-layout
+      text-xs-center
+      justify-center
+      wrap
+      v-else>
+        <v-flex xs12 md8 lg6>
+          <v-card>
+            <v-expansion-panel>
+              <v-expansion-panel-content
+                v-for="(item,i) in quizData"
+                :key="i"
+              >
+                <template v-slot:header>
+                  <div><v-icon :color="item.result ? 'green' : 'red'" dark v-on="on">
+                    {{ item.result ? 'thumb_up' : 'thumb_down' }}</v-icon>
+                    {{ item.sn }}
+                  </div>
+                </template>
+                <v-card>
+                  <v-container grid-list-sm fluid>
+                    <v-layout row wrap>
+                      <v-flex
+                        v-for="(photo, i) in item.ninePhotos"
+                        :key="i"
+                        xs4
+                        d-flex
+                      >
+                    <v-card flat tile class="d-flex">
+                    <v-img
+                      :src="photo.medium_url"
+                      aspect-ratio="1"
+                      class="grey lighten-2"
+                    >
+                      <template v-slot:placeholder>
+                        <v-layout
+                          fill-height
+                          align-center
+                          justify-center
+                          ma-0
+                        >
+                          <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                        </v-layout>
+                      </template>
+                    </v-img>
+                    </v-card>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
               </v-card>
-            </v-dialog>
-          </div>
-          <div>
-            Score: {{ scoreRight }}/{{ scoreTotal }}
-          </div>
-        </v-card-text>
-        </v-card>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-card>
         </v-flex>
       </v-layout>
   </v-container>
@@ -167,7 +209,7 @@ export default {
       list: null,
       quizData: [],
       carouselIndex: 0,
-      plantIndex: 0
+      plantIndex: 0,
     }
   },
   methods: {
@@ -237,6 +279,13 @@ export default {
     next: function() {
       this.plantIndex += 1;
       this.carouselIndex = 0;
+    },
+    previous: function() {
+      this.plantIndex -= 1;
+      this.carouselIndex = 0;
+    },
+    seeResults: function() {
+      //
     }
   },
   computed: {
@@ -270,7 +319,34 @@ export default {
     visiblePlant: function() {
       if (this.plantIndex == 0) {
         return [[], this.quizData[this.plantIndex], this.quizData[this.plantIndex + 1]];
+      } else if (this.plantIndex == this.totalPlants - 1) {
+        return [this.quizData[this.plantIndex - 1], this.quizData[this.plantIndex]];
       } else { return [this.quizData[this.plantIndex - 1], this.quizData[this.plantIndex], this.quizData[this.plantIndex + 1]]; }
+    },
+    totalPlants: function() {
+      var total = 0;
+      if (!this.plants) { return total; }
+      return this.plants.length;
+    },
+    totalCorrect: function() {
+      var totalCorrect = 0;
+      if (!this.quizData) { return total; }
+      for (var plant in this.quizData) {
+        if (this.quizData[plant].result == true) { totalCorrect += 1; }
+      }
+      return totalCorrect;
+    },
+    totalGuessed: function() {
+      var totalCorrect = 0;
+      if (!this.quizData) { return total; }
+      for (var plant in this.quizData) {
+        if (this.quizData[plant].submitted == true) { totalCorrect += 1; }
+      }
+      return totalCorrect;
+    },
+    finished: function() {
+      if ( this.totalGuessed >= this.totalPlants ) { return true }
+      else { return false }
     }
   }
 }
